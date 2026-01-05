@@ -1,5 +1,8 @@
 import express, { type Application } from "express";
 import userRouter from "./routes/user.routes.js";
+import taskRouter from "./routes/task.routes.js";
+import listRouter from "./routes/list.routes.js";
+import settingsRouter from "./routes/settings.routes.js";
 import cors from "cors";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
@@ -55,6 +58,9 @@ app.get("/health", (_req, res) => {
  * API Routes
  */
 app.use("/api", userRouter);
+app.use("/api", taskRouter);
+app.use("/api", listRouter);
+app.use("/api", settingsRouter);
 
 /**
  * 404 Handler
