@@ -8,15 +8,14 @@ export const createTaskSchema = z.object({
   status: statusEnum.default("TODO"),
   dueDate: isoDateString.optional(),
   priority: priorityEnum.default("LOW"),
-  authorId: idSchema,
   listId: idSchema.optional(),
   archived: z.boolean().optional(),
 });
 
-// Task: update (partial but requires id)
+// Task: update (partial but requires id from params, not body)
 export const updateTaskSchema = z
   .object({
-    id: idSchema,
+    id: idSchema, // Keep this because tasks send id in body, not URL param
     taskName: z.string().min(1).max(100).optional(),
     description: z.string().max(200).optional(),
     status: statusEnum.optional(),
@@ -31,7 +30,9 @@ export const updateTaskSchema = z
   });
 
 // Task: toggle archived/status via params
-export const taskIdParamsSchema = z.object({ taskId: idSchema });
+export const taskIdParamsSchema = z.object({
+  taskId: z.string().regex(/^\d+$/, "Task ID must be a positive integer"),
+});
 export const toggleStatusBodySchema = z.object({ status: statusEnum });
 
 export type CreateTaskInput = z.infer<typeof createTaskSchema>;
