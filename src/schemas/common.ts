@@ -13,6 +13,10 @@ export const languageEnum = z.enum(["EN", "ES"]);
 
 // Common primitives
 export const idSchema = z.number().int().positive();
+// For URL params (which are always strings) - wraps as object for validation
+export const idParamsSchema = z.object({
+  id: z.string().regex(/^\d+$/, "ID must be a positive integer"),
+});
 export const colorHexSchema = z
   .string()
   .regex(/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/, {
