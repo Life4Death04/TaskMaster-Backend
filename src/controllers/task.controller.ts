@@ -66,7 +66,7 @@ export async function createTask(
     res.status(201).json({
       success: true,
       message: "Task created successfully",
-      data: task,
+      data: { task },
     });
   } catch (err) {
     next(err);
