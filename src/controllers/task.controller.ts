@@ -31,7 +31,7 @@ export async function fetchTasks(
 
     res.status(200).json({
       success: true,
-      tasks,
+      data: tasks,
     });
   } catch (err) {
     next(err);
@@ -66,7 +66,7 @@ export async function createTask(
     res.status(201).json({
       success: true,
       message: "Task created successfully",
-      data: { task },
+      data: task,
     });
   } catch (err) {
     next(err);
