@@ -98,6 +98,7 @@ export interface TasksResponse {
 
 export interface CreateListRequest {
   title: string;
+  description?: string;
   color?: string;
   authorId: number;
 }
@@ -105,6 +106,7 @@ export interface CreateListRequest {
 export interface UpdateListRequest {
   id: number;
   title?: string;
+  description?: string;
   color?: string;
 }
 

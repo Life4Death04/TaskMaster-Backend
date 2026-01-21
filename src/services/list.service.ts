@@ -8,6 +8,7 @@ import type { List } from "@prisma/client";
  */
 export async function createList(input: {
   title: string;
+  description?: string;
   color?: string;
   authorId: number;
 }): Promise<List> {
@@ -23,6 +24,7 @@ export async function createList(input: {
   const list = await prisma.list.create({
     data: {
       title: input.title,
+      description: input.description ?? null,
       color: input.color ?? "#000000",
       authorId: input.authorId,
     },
@@ -57,7 +59,7 @@ export async function getListsByUserId(userId: number): Promise<List[]> {
  */
 export async function getSingleListById(
   listId: number,
-  userId: number
+  userId: number,
 ): Promise<List & { tasks: any[] }> {
   // Verify user exists
   const user = await prisma.user.findUnique({
@@ -93,6 +95,7 @@ export async function updateListById(input: {
   id: number;
   userId: number;
   title?: string;
+  description?: string;
   color?: string;
 }): Promise<List> {
   // Verify user exists
@@ -119,6 +122,8 @@ export async function updateListById(input: {
   // Build update data dynamically
   const updateData: Partial<List> = {};
   if (input.title !== undefined) updateData.title = input.title;
+  if (input.description !== undefined)
+    updateData.description = input.description;
   if (input.color !== undefined) updateData.color = input.color;
 
   const updatedList = await prisma.list.update({
@@ -135,7 +140,7 @@ export async function updateListById(input: {
  */
 export async function deleteListById(
   listId: number,
-  userId: number
+  userId: number,
 ): Promise<void> {
   // Verify user exists
   const user = await prisma.user.findUnique({
