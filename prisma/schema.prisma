@@ -31,6 +31,7 @@ model User{                           //We can use uuid() instead of autoincreme
 model List{
   id              Int           @id       @default(autoincrement())
   title           String        @db.VarChar(50)
+  description     String?       @db.VarChar(50) // Optional description for the list
   color           String        @db.VarChar(20) @default("#000000")//Color code
   authorId        Int           // User who created the list
   author          User          @relation(fields: [authorId], references: [id])
