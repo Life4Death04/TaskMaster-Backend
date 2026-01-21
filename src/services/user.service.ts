@@ -45,7 +45,7 @@ export async function updateUserById(
     profileImage?: string;
     phoneNumber?: string;
     password?: string;
-  }
+  },
 ): Promise<User> {
   // Build update data object dynamically
   const updateData: Prisma.UserUpdateInput = {}; // Initialize empty update data. It creates an empty object (using the Prisma.UserUpdateInput type) to hold the fields that will be updated in the user record.
@@ -63,12 +63,26 @@ export async function updateUserById(
 }
 
 export async function deleteUserById(id: number): Promise<void> {
-  await prisma.user.delete({ where: { id } });
+  // Cascading delete: remove all related data before deleting user
+  // Using transaction to ensure atomicity (all or nothing)
+  await prisma.$transaction(async (tx) => {
+    // 1. Delete all tasks created by the user
+    await tx.task.deleteMany({ where: { authorId: id } });
+
+    // 2. Delete all lists created by the user
+    await tx.list.deleteMany({ where: { authorId: id } });
+
+    // 3. Delete user settings
+    await tx.userSettings.deleteMany({ where: { userId: id } });
+
+    // 4. Finally, delete the user
+    await tx.user.delete({ where: { id } });
+  });
 }
 
 export async function verifyPassword(
   plain: string,
-  hashed: string
+  hashed: string,
 ): Promise<boolean> {
   return bcrypt.compare(plain, hashed);
 }
@@ -86,7 +100,7 @@ export function signToken(payload: {
 
 // Convert User to SafeUser by omitting sensitive fields. Used in API responses.
 export function toSafeUser(
-  user: User
+  user: User,
 ): Pick<
   User,
   "id" | "email" | "firstName" | "lastName" | "profileImage" | "createdAt"
