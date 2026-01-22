@@ -34,9 +34,11 @@ export async function createList(input: {
 }
 
 /**
- * Get all lists for a user
+ * Get all lists for a user with tasks included
  */
-export async function getListsByUserId(userId: number): Promise<List[]> {
+export async function getListsByUserId(
+  userId: number,
+): Promise<(List & { tasks: any[] })[]> {
   // Verify user exists
   const user = await prisma.user.findUnique({
     where: { id: userId },
@@ -48,6 +50,9 @@ export async function getListsByUserId(userId: number): Promise<List[]> {
 
   const lists = await prisma.list.findMany({
     where: { authorId: userId },
+    include: {
+      tasks: true,
+    },
     orderBy: { id: "desc" }, // Most recent first
   });
 
