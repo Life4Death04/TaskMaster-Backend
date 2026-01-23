@@ -14,7 +14,7 @@ import type {
 export async function createList(
   req: Request<{}, {}, CreateListInput>,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   try {
     // Get userId from authenticated request
@@ -49,7 +49,7 @@ export async function createList(
 export async function getLists(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   try {
     // Get userId from authenticated request
@@ -81,7 +81,7 @@ export async function getLists(
 export async function getListById(
   req: Request<{ id: string }>,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   try {
     // Get userId from authenticated request
@@ -119,7 +119,7 @@ export async function getListById(
 export async function updateList(
   req: Request<{ id: string }, {}, UpdateListInput>,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   try {
     // Get userId from authenticated request
@@ -159,7 +159,7 @@ export async function updateList(
 export async function deleteList(
   req: Request<{ id: string }>,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   try {
     // Get userId from authenticated request
@@ -183,6 +183,44 @@ export async function deleteList(
     res.status(200).json({
       success: true,
       message: "List deleted successfully",
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+/**
+ * Toggle favorite status of a list
+ * PATCH /api/lists/:id/favorite
+ */
+export async function toggleListFavorite(
+  req: Request<{ id: string }>,
+  res: Response,
+  next: NextFunction,
+) {
+  try {
+    // Get userId from authenticated request
+    const userIdRaw = req.user?.sub ?? req.user?.id;
+    const userId =
+      typeof userIdRaw === "string" ? Number(userIdRaw) : userIdRaw;
+
+    if (!userId || Number.isNaN(userId)) {
+      res.status(401).json({ message: "Unauthorized" });
+      return;
+    }
+
+    const listId = Number(req.params.id);
+    if (Number.isNaN(listId)) {
+      res.status(400).json({ message: "Invalid list ID" });
+      return;
+    }
+
+    const list = await ListService.toggleListFavorite(listId, userId);
+
+    res.status(200).json({
+      success: true,
+      message: "List favorite status toggled successfully",
+      list,
     });
   } catch (err) {
     next(err);

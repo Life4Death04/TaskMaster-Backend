@@ -17,7 +17,7 @@ router.post(
   "/lists",
   auth,
   validate({ body: createListSchema }),
-  ListController.createList
+  ListController.createList,
 );
 
 /**
@@ -34,7 +34,7 @@ router.get(
   "/lists/:id",
   auth,
   validate({ params: idParamsSchema }),
-  ListController.getListById
+  ListController.getListById,
 );
 
 /**
@@ -45,7 +45,7 @@ router.put(
   "/lists/:id",
   auth,
   validate({ params: idParamsSchema, body: updateListSchema }),
-  ListController.updateList
+  ListController.updateList,
 );
 
 /**
@@ -56,7 +56,18 @@ router.delete(
   "/lists/:id",
   auth,
   validate({ params: idParamsSchema }),
-  ListController.deleteList
+  ListController.deleteList,
+);
+
+/**
+ * PATCH /api/lists/:id/favorite
+ * Toggle favorite status of a list
+ */
+router.patch(
+  "/lists/:id/favorite",
+  auth,
+  validate({ params: idParamsSchema }),
+  ListController.toggleListFavorite,
 );
 
 export default router;
