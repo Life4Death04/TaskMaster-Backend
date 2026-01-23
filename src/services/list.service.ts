@@ -178,3 +178,42 @@ export async function deleteListById(
     where: { id: listId },
   });
 }
+
+/**
+ * Toggle favorite status of a list
+ */
+export async function toggleListFavorite(
+  listId: number,
+  userId: number,
+): Promise<List> {
+  // Verify user exists
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+  });
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  // Find list and verify it belongs to user
+  const list = await prisma.list.findFirst({
+    where: {
+      id: listId,
+      authorId: userId,
+    },
+  });
+
+  if (!list) {
+    throw new Error("List not found or does not belong to user");
+  }
+
+  // Toggle the favorite status
+  const updatedList = await prisma.list.update({
+    where: { id: listId },
+    data: {
+      isFavorite: !list.isFavorite,
+    },
+  });
+
+  return updatedList;
+}

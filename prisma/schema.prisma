@@ -13,58 +13,59 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User{                           //We can use uuid() instead of autoincrement() to avoid what we know
-  id              Int         @id         @default(autoincrement())
-  firstName       String      @db.VarChar(50)    
-  lastName        String      @db.VarChar(50)
-  email           String      @unique
-  password        String  
-  profileImage    String?     @db.VarChar(255)
-  phoneNumber     String?     @db.VarChar(30) //Deprecated
-  createdAt       DateTime    @default(now()) @db.Timestamp(0)
-  emailVerified   Boolean     @default(false)
-  tasks           Task[]      // Tasks created by the user
-  lists           List[]      // Lists created by the user
-  settings        UserSettings? // User settings (one-to-one relationship)
+model User {
+  id            Int           @id @default(autoincrement())
+  firstName     String        @db.VarChar(50)
+  lastName      String        @db.VarChar(50)
+  email         String        @unique
+  password      String
+  profileImage  String?       @db.VarChar(255)
+  phoneNumber   String?       @db.VarChar(30) //Deprecated
+  createdAt     DateTime      @default(now()) @db.Timestamp(0)
+  emailVerified Boolean       @default(false)
+  tasks         Task[] // Tasks created by the user
+  lists         List[] // Lists created by the user
+  settings      UserSettings? // User settings (one-to-one relationship)
 }
 
-model List{
-  id              Int           @id       @default(autoincrement())
-  title           String        @db.VarChar(50)
-  description     String?       @db.VarChar(50) // Optional description for the list
-  color           String        @db.VarChar(20) @default("#000000")//Color code
-  authorId        Int           // User who created the list
-  author          User          @relation(fields: [authorId], references: [id])
-  tasks           Task[]        // Tasks in the list
-  createdAt       DateTime      @default(now()) @db.Timestamp(0)
+model List {
+  id          Int      @id @default(autoincrement())
+  title       String   @db.VarChar(50)
+  description String?  @db.VarChar(50) // Optional description for the list
+  color       String   @default("#000000") @db.VarChar(20) //Color code
+  isFavorite  Boolean  @default(false) // Whether this list is favorited by the user
+  authorId    Int // User who created the list
+  author      User     @relation(fields: [authorId], references: [id])
+  tasks       Task[] // Tasks in the list
+  createdAt   DateTime @default(now()) @db.Timestamp(0)
 }
 
-model Task{
-  id              Int           @id       @default(autoincrement())
-  taskName        String        @db.VarChar(100)
-  description     String?       @db.VarChar(200)
-  status          Status      
-  dueDate         DateTime?   
-  priority        Priority      @default(LOW)
-  authorId        Int           // User who created the task
-  author          User          @relation(fields: [authorId], references: [id])
-  listId          Int?          // List to which the task belongs
-  list            List?         @relation(fields: [listId], references: [id])
-  archived        Boolean       @default(false) // New field to indicate if the task is archived
+model Task {
+  id          Int       @id @default(autoincrement())
+  taskName    String    @db.VarChar(100)
+  description String?   @db.VarChar(200)
+  status      Status
+  dueDate     DateTime?
+  priority    Priority  @default(LOW)
+  authorId    Int // User who created the task
+  author      User      @relation(fields: [authorId], references: [id])
+  listId      Int? // List to which the task belongs
+  list        List?     @relation(fields: [listId], references: [id])
+  archived    Boolean   @default(false) // New field to indicate if the task is archived
 }
 
 model UserSettings {
-  id              Int           @id       @default(autoincrement())
-  theme           Theme         @default(LIGHT) // Default theme is light
-  dateFormat      DateFormat    @default(MM_DD_YYYY) // Default date format
-  language        Language      @default(EN) // Default language is English
-  defaultPriority Priority      @default(MEDIUM) // Default priority for new tasks
-  defaultStatus   Status        @default(TODO) // Default status for new tasks
-  userId          Int           @unique
-  user            User          @relation(fields: [userId], references: [id])
+  id              Int        @id @default(autoincrement())
+  theme           Theme      @default(LIGHT) // Default theme is light
+  dateFormat      DateFormat @default(MM_DD_YYYY) // Default date format
+  language        Language   @default(EN) // Default language is English
+  defaultPriority Priority   @default(MEDIUM) // Default priority for new tasks
+  defaultStatus   Status     @default(TODO) // Default status for new tasks
+  userId          Int        @unique
+  user            User       @relation(fields: [userId], references: [id])
 }
 
-enum Language { // Language preference of the user
+enum Language {
   EN
   ES
 }
@@ -75,18 +76,18 @@ enum DateFormat {
   YYYY_MM_DD
 }
 
-enum Theme { // Theme of the user interface
+enum Theme {
   LIGHT
   DARK
 }
 
-enum Status { // Status of the task
+enum Status {
   TODO
   IN_PROGRESS
   DONE
 }
 
-enum Priority { // Priority of the task
+enum Priority {
   LOW
   MEDIUM
   HIGH
